@@ -111,3 +111,109 @@ def test6(request,yy):
 ## 页面重定向
 
 rediect
+
+## 模板路径配置
+
+第一张方法：在pycharm项目中新建templates文件，然后再templates中新建各个app名字的文件，在settings中更改
+
+第二张方法：在app中创建templates文件，把app名字添加注册到settings中的INSTALLED_APPS
+
+然后就可以在views.py中引用templates中的HTML文件
+
+## 模板变量的引入
+
+通过render进行渲染，可以引入字符串，列表，元组，字典，函数，类对象
+
+## 过滤器
+
+语法 {{ str|lower }}      小写输出
+
+​         注意：使用参数时， | 两边不能有空格
+
+## 静态文件引用
+
+在项目目录下创建static文件，在settings.py中进行配置，
+
+```python
+STATIC_URL = '/static/'
+STATICFILES_DIRS=[
+	os.path.join(BASE_DIR,‘static')
+]
+```
+
+## 模板便签
+
+常用标签：标签语法  由 {% 和 %} 来定义的，例如{%tag%} {%endtag%}
+
+ ## 模板的继承与引用
+
+继承：
+
+{% extends '继承页面的地址'%}
+
+需要修改时，用{%block 名称 %} 内容 {% endblock %}包裹，就可以修改内容。
+
+在继承基础之上修改，使用{{ block.super }}
+
+引用：
+
+{% include  ‘music.html’ %}
+
+## 自定义过滤器及标签
+
+ 自定义过滤器：在当前项目文件新建文件夹common，在common文件中新建文件夹templatetags，并在settings中进行app注册
+
+```python
+from django import template
+
+register = template.Library()
+@register.filter              #方法1
+def my_lower(value):
+	return value.lower()
+register.filter(my_lower)       #方法2
+```
+
+使用时进行{% load 文件名 %}就可以使用过滤器
+
+
+
+简单标签：
+
+```python
+views.py
+
+from django.shortcuts import render
+
+def index(request):
+	return render(request,'index.html',
+	context={'format_string':'%Y-%m-%d %H:%M:%S'})
+```
+
+```python
+from django import template
+import datetime
+
+@register.simple_tag
+def current_time1(format_string):
+	return datetime.datetime.now().strfting(format_string)
+
+@register.simple_tag(takes_context=True)   #表示可以接收上下文传参
+def current_time2(context):
+    format_string = context.get('format_string')
+    return datetime.datetime.now().strfting(format_string)
+```
+
+使用{% current_time1 '%Y-%m-%d %H:%M:%S' %}   输出当前时间
+
+或是{% current_time %}输出当前时间
+
+
+
+## django模型基础
+
+
+
+
+
+
+

@@ -213,7 +213,128 @@ def current_time2(context):
 
 
 
+数据库的配置：
+
+1.在settings.py中配置DATABASES
+
+```python
+DATABASES = {
+		'default': {
+        'ENGINE': 'django.db.backends.mysql',      # 数据库引擎
+        'NAME': 'mydb',                            #数据库名称
+        'USER': 'admin',                      # 链接数据库的用户名
+        'PASSWORD': 'Root110qwe',             # 链接数据库的密码
+        'HOST': '127.0.0.1',             # mysql服务器的域名和ip地址
+        'PORT': '3306',               # mysql的一个端口号,默认是3306
+    			}
+		}
+```
+
+2.在虚拟环境中安装pymysql:      pip insutall pymysql
+
+   设置连接器为pymysql     在主目录下的__ init __.py 文件添加下面两句
+
+```python
+import pymysql
+pymysql.install_as_MySQLdb()
+```
+
+## 使用Django中的模型
+
+1.在app下面的models.py中创建django的模型类
+
+```python
+models.py
+from django.db import models
+
+class User(models.Model):
+	id = models.AutoField(primary_key=True)   #主键可省略，django会自动加上
+	name = models.CharField(max_length=30)
+	age = models.IntegerField()
+	
+	def __str__(self):     #在查询时可看
+		return 'User<id=%s,name=%s,age=%s>' % (self.id, self.name, self.age)
+```
+
+## 将模型类映射到数据库：
+
+1.首先执行以下命令，创建映射文件
+
+```python
+python mange.py makemigrations
+```
+
+2.将映射文件中的映射数据提交到数据库中
+
+```
+python mange.py migrate
+```
+
+命令后面可添加app名称，表示指定对某个app进行映射，不写表示所有app都执行映射。
+
+## 数据的增删改查
+
+1.在视图函数中导入User模型类，添加数据
+
+```python
+from .models import User
+def add_user(request):
+	#方法1
+	xiaoming = User(name='xiaoming',age=18)
+	xiaoming.save()
+	#方法2
+	xiaohong = User()
+	xiaohong.name = 'xiaohong'
+	xiaohong.age = 18
+	xiaohong.save()
+	#方法3
+	User.objects.create(name='xiaoming',age=18)
+	#方法4
+	User.objects.get_or_create(name='xiaoming',age=21)
+	return HttpResponse('add success!!!')
+```
+
+2.在视图函数中导入User模型类，实现简单的查找
+
+```python
+def search_user(request):
+	#查询所以记录对象
+	rs = User.object.all()
+	#查询一个
+	rs = User.object.get(id=1)
+	#查询满足条件的对象
+	rs = User.object.filter(name='xiaoming')
+	print(rs)
+	return HttpResponse('query success!!!')
+```
+
+all()和filter()方法返回的是QuerySet对象
+
+get()方式返回的单个对象，如果符合条件的有多个，则get报错
 
 
 
+3.在视图函数中导入User模型，然后使用下面的方法更新数据
+
+```python
+def update_user(request):
+	#先查找到再属性赋值修改
+	rs = User.objects.get(name='xiaoming')
+	rs.name = 'xiaohu'
+	rs.save()
+	#使用update方法直接修改
+	User.objects.filter(name='xiaoming').update(name='XX')
+	User.objects.all().update(age=22)
+	return HttpResponse('Update success!!!')
+```
+
+4.在视图函数中导入User模型,然后使用下面方法删除数据
+
+```python
+def delete_user(request):
+	#User.objects.get(id=1).delete()
+	#User.objects.filter(age=18).delete()
+	#User.objects.all().delete()
+	return HttpResponse('delete success!!!')
+```
 

@@ -338,3 +338,77 @@ def delete_user(request):
 	return HttpResponse('delete success!!!')
 ```
 
+## 常用的查询方法：
+
+```python
+rs = User.objects.all()     # 获取所有记录
+rs = User.objects.first()   # 获取第一条记录
+rs = User.objects.last()    # 获取最后一条数据
+rs = User.objects.filter(name='xiaoming')  # 根据提供参数过滤数据
+rs = User.objects.exclude(name='xiaoming')  # 根据括号内参数排除xiaoming的记录
+rs = User.objects.get(name='xiaoming')  #获取一个记录对象，get方法返回的对象具有唯一性，如果有多个符合，则会报错
+rs = User.objects.order_by('age')   #对结果排序，可在括号内加入多个排序对象，如需逆向排序，在参数前加负号
+rs = User.objects.all().values()   # 将返回的QuerySet中的Model转换为字典
+rs = User.objects.count()   # 获取当前查询到的数据的总数
+```
+
+## 常用的查询条件：
+
+```
+rs = User.objects.filter(name__exact='xiaoming')   # exact 相当与等于号
+rs = User.objects.filter(name__contains='xi')  # contains 包含
+rs = User.objects.filter(name__startwith='xiao')  # startwith 以什么开始    istartwith 同startwith
+# endwith 以什么结尾
+rs = User.objects.filter(age__in=[18,20])  # 年龄在18，20
+rs = User.objects.filter(age__range(18,20))  # 年龄在18，19，20
+# gt  大于
+# gte  大于等于
+# lt  小于
+# lte  小于等于
+# isnull  判断是否为空
+```
+
+## 常见的字段类型映射关系
+
+ 整型：   int   对应   IntegetField       
+
+ 字符类型：    varchar   对应   CharField
+
+ 文本类型：   longtext   对应  TextField 
+
+ 日期类型：    date  对应  DateField
+
+ 日期时间类型：  datetime  对应  DateTimeField
+
+## Field的常见类型
+
+```
+primary_key:  指定是否为主键。
+unique:  指定是否唯一。
+null:  指定是否为空，默认为False。
+blank: 等于True时form表单验证时可以为空，默认为False。
+default:  设置默认值。
+DateField.auto_now:  每次修改都会将当前时间更新进去，只有调用，QuerySet.update方法将不会调用。这个参数只是Date和DateTime以及TimModel.save()方法才会调用e类才有的。
+DateField.auto_now_add:  第一次添加进去，都会将当前时间设置进去。以后修改，不会修改这个值
+```
+
+```python
+class Fest(models.Model):
+	name = models.CharField(max_length=30,unique=True)
+	age = models.IntegerField()
+    note = models.TextField()
+    gender = models.BooleanField(dafault=True)
+    create_time = models.DateField(auto_now_add=True)  # 创建时间
+    update_time = models.DateTimeField(auto_now=True)  # 修改时间
+```
+
+## 表关系的实现
+
+一对多       外键       ForeignKeyField
+
+一对一       外键+唯一键     OneToOneField
+
+多对多       关联表：外键+联合唯一     ManyToManyField
+
+
+
